@@ -1,0 +1,68 @@
+import React, { useState, useCallback } from 'react';
+import { Chip, Menu, MenuItem, Box } from '@mui/material';
+
+type FilterProps = {
+  categories: string[];
+  onCategorySelect: (category: string) => void;
+};
+
+const Filter = ({ categories, onCategorySelect }: FilterProps) => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>('All');
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [visibleCategories, setVisibleCategories] = useState<string[]>(['All', ...categories]);
+
+  const handleChipClick = useCallback((category: string) => {
+    setSelectedCategory(category);
+    onCategorySelect(category);
+  }, [onCategorySelect]);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (category: string) => {
+    setVisibleCategories((prev) => [...prev, category]);
+    handleChipClick(category);
+    handleMenuClose();
+  };
+
+  return (
+    <Box display="flex" gap={1} alignItems="center">
+      {visibleCategories.map((category, index) => (
+        <Chip
+          key={category}
+          label={category}
+          onClick={() => handleChipClick(category)}
+          sx={{
+            backgroundColor: selectedCategory === category ? 'black' : 'default',
+            color: selectedCategory === category ? 'white' : 'black',
+          }}
+        />
+      ))}
+
+      <Chip label="More" onClick={handleMenuClick} />
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        {categories.map((category) => (
+          !visibleCategories.includes(category) && (
+            <MenuItem
+              key={category}
+              onClick={() => handleMenuItemClick(category)}
+            >
+              {category}
+            </MenuItem>
+          )
+        ))}
+      </Menu>
+    </Box>
+  );
+};
+
+export default Filter;

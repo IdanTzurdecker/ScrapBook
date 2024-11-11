@@ -1,0 +1,71 @@
+import React, { useState } from 'react';
+import { Chip, Menu, MenuItem, IconButton } from '@mui/material';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+
+const categories = ["Users", "Support", "Order", "Sales", "Marketing", "Finance", "HR", "IT", "Development"];
+
+const CategoryFilter = ({ onCategoryChange }) => {
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const visibleCategories = ["All", ...categories.slice(0, 5)];
+  const additionalCategories = categories.slice(5);
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category === "All" ? null : category);
+    onCategoryChange(category === "All" ? null : category);
+  };
+
+  const handleMoreClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (category) => {
+    if (!visibleCategories.includes(category)) {
+      visibleCategories.push(category); // Add the selected category to the chip row
+    }
+    setSelectedCategory(category);
+    onCategoryChange(category);
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      {visibleCategories.map((category) => (
+        <Chip
+          key={category}
+          label={category}
+          onClick={() => handleCategoryClick(category)}
+          sx={{
+            backgroundColor: selectedCategory === category || (category === "All" && selectedCategory === null)
+              ? 'black'
+              : 'default',
+            color: selectedCategory === category || (category === "All" && selectedCategory === null)
+              ? 'white'
+              : 'default',
+          }}
+          clickable
+        />
+      ))}
+      {additionalCategories.length > 0 && (
+        <>
+          <IconButton onClick={handleMoreClick}>
+            <MoreHorizIcon />
+          </IconButton>
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+            {additionalCategories.map((category) => (
+              <MenuItem key={category} onClick={() => handleMenuItemClick(category)}>
+                {category}
+              </MenuItem>
+            ))}
+          </Menu>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default CategoryFilter;
